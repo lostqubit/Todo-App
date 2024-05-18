@@ -188,10 +188,12 @@ header img{
     background-color: #f8f9fa;
     border-color: #003459;
     color: #003459;
+    cursor: pointer;
 }
 
 .span-2 img{
     height: 1.15rem;
+    cursor: pointer;
 }
 
 .taskform{

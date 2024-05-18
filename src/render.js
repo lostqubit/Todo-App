@@ -6,6 +6,14 @@ import deleteIcon from './icons/delete.svg';
 import closeIcon from './icons/close.svg';
 
 const taskPage = (() => {
+    const tasks = {};
+    let count = 0;
+
+    for(let i=1;i<=100;i++){
+        count++;
+        tasks[count] = task(`Test-${i}`,"High",format(new Date(), 'dd/MM/yyyy'));;
+    }
+
     let parentDiv = document.querySelector("#content-body");
     let container;
     let taskFormContainer;
@@ -126,8 +134,8 @@ const taskPage = (() => {
             event.preventDefault();
             const data = new FormData(event.target);
             const newTask = task(data.get('title'),data.get('priority'),format(new Date(data.get("date")), 'dd/MM/yyyy'),data.get('project'),data.get('details'));
-            console.log(newTask);
-            addTask(newTask);
+            count++;
+            addTask(newTask,count);
             formContainer.style.display = "none";
             form.reset();
             datePicker.valueAsDate = new Date();
@@ -145,32 +153,6 @@ const taskPage = (() => {
         });
 
         return formContainer;
-    };
-
-    const load = () => {
-        container = document.createElement("div");
-        container.setAttribute("class","tasks");
-
-        const heading = document.createElement("h2");
-        heading.append("Tasks");
-
-        const button = document.createElement("button");
-        button.classList.add("addTask");
-        const addImage = document.createElement("img");
-        addImage.src = addIcon;
-
-        button.appendChild(addImage);
-        heading.appendChild(button);
-
-        parentDiv.appendChild(heading);
-        parentDiv.appendChild(container);
-
-        taskFormContainer = createTaskForm();
-        parentDiv.appendChild(taskFormContainer);
-
-        button.addEventListener("click", () => {
-            taskFormContainer.style.display = "flex";
-        });
     };
 
     const createTaskContainer = () => {
@@ -198,6 +180,12 @@ const taskPage = (() => {
         const deleteImg = document.createElement("img");
         deleteImg.src = deleteIcon;
 
+        deleteImg.addEventListener("click",(event) => {
+            const todelete = event.target.parentElement.parentElement.id;
+            document.querySelector(`#${todelete}`).remove();
+            delete tasks[todelete.split("-")[1]];
+        });
+
         span2.appendChild(details);
         span2.appendChild(dueDate);
         span2.appendChild(editImg);
@@ -209,11 +197,42 @@ const taskPage = (() => {
         return{card,title,dueDate};
     }
 
-    const addTask = (task) => {
+    const addTask = (task,taskId) => {
         const {card,title,dueDate} = createTaskContainer();
+        card.id = `task-${taskId}`;
         title.innerText = task.title;
         dueDate.innerText = task.dueDate;
         container.prepend(card);
+    };
+
+    const load = () => {
+        container = document.createElement("div");
+        container.setAttribute("class","tasks");
+
+        const heading = document.createElement("h2");
+        heading.append("Tasks");
+
+        const button = document.createElement("button");
+        button.classList.add("addTask");
+        const addImage = document.createElement("img");
+        addImage.src = addIcon;
+
+        button.appendChild(addImage);
+        heading.appendChild(button);
+
+        parentDiv.appendChild(heading);
+        parentDiv.appendChild(container);
+
+        taskFormContainer = createTaskForm();
+        parentDiv.appendChild(taskFormContainer);
+
+        button.addEventListener("click", () => {
+            taskFormContainer.style.display = "flex";
+        });
+
+        for(let taskId of Object.keys(tasks)){
+            addTask(tasks[taskId],taskId);
+        }
     };
 
     return {load,addTask};
