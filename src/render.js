@@ -4,7 +4,6 @@ import addIcon from './icons/addtask.svg';
 import editIcon from './icons/edit.svg';
 import deleteIcon from './icons/delete.svg';
 import closeIcon from './icons/close.svg';
-import { differenceInBusinessDays } from 'date-fns';
 
 const taskPage = (() => {
     let parentDiv = document.querySelector("#content-body");
@@ -136,11 +135,13 @@ const taskPage = (() => {
 
         closeButton.addEventListener("click",() => {
             formContainer.style.display = "none";
+            datePicker.valueAsDate = new Date();
         });
 
         cancelButton.addEventListener("click", () => {
             form.reset();
             formContainer.style.display = "none";
+            datePicker.valueAsDate = new Date();
         });
 
         return formContainer;
