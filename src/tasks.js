@@ -1,9 +1,10 @@
-const task = (title,priority,dueDate,status="Not Finished",project="My Project") => {
+const task = (title,priority,dueDate,project="General",details="",status="Not Finished") => {
     let taskTitle = title;
     let taskPriority = priority;
     let taskDueDate = dueDate;
     let taskStatus = status;
     let taskProject = project;
+    let taskDetails = details;
 
     return{
         get title() {return taskTitle},
@@ -16,6 +17,8 @@ const task = (title,priority,dueDate,status="Not Finished",project="My Project")
         set status(newStatus) {taskStatus = newStatus},
         get project() {return taskProject},
         set project(newProject) {taskProject=newProject},
+        get details() {return taskDetails},
+        set details(newDetail) {taskDetails = newDetail}, 
     }
 };
 

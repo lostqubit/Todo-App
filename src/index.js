@@ -1,12 +1,14 @@
 import './style.css';
 import task from './tasks.js';
-import display from './render.js';
+import taskPage from './render.js';
 import {format} from 'date-fns';
 
 const tasks = [];
 
-for(let i=0;i<20;i++){
+taskPage.load();
+
+for(let i=0;i<5;i++){
     const task1 = task("Code Task creation logic","high",format(new Date(), 'dd/MM/yyyy'));
-    display.addTask(task1);
+    taskPage.addTask(task1);
     tasks.push(task1);
 }
