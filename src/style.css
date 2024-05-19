@@ -191,6 +191,12 @@ header img{
     cursor: pointer;
 }
 
+.span-2 button:hover{
+    border: none;
+    background-color: #0369a1;
+    color: #f8f9fa;
+}
+
 .span-2 img{
     height: 1.15rem;
     cursor: pointer;
@@ -276,14 +282,14 @@ header img{
     border: 2px solid black;
 }
 
-#add-todo+div{
+#edit-todo+div, #add-todo+div{
     margin-top: 20px;
     display: flex;
     justify-content: center;
     gap: 10px;
 }
 
-#add-todo+div>button{
+#edit-todo+div>button, #add-todo+div>button{
     border:none;
     outline:none;
     height: 30px;
@@ -291,12 +297,12 @@ header img{
     cursor: pointer;
 }
 
-#add-todo+div>button:first-child{
+#edit-todo+div>button:first-child, #add-todo+div>button:first-child{
     background-color: #6ee7b7;
     font-weight: 500;
 }
 
-#add-todo+div>button:last-child{
+#edit-todo+div>button:last-child, #add-todo+div>button:last-child{
     background-color: #fca5a5;
     font-weight: 500;
 }
