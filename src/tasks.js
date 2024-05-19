@@ -4,7 +4,7 @@ const task = (title,priority,dueDate,project="General",details="",status="Not Fi
     let taskDueDate = dueDate;
     let taskStatus = status;
     let taskProject = project;
-    let taskDetails = details;
+    let taskDetails = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius debitis, ab blanditiis vero reprehenderit enim. Saepe blanditiis, ratione minima aliquid iste ea. Accusantium, illo! Debitis cum quam numquam quas suscipit!";
 
     return{
         get title() {return taskTitle},

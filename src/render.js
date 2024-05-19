@@ -11,7 +11,7 @@ const taskPage = (() => {
 
     for(let i=1;i<=100;i++){
         count++;
-        tasks[count] = task(`Test-${i}`,"High",format(new Date(), 'dd/MM/yyyy'));;
+        tasks[count] = task(`Test-${i}`,"High",format(new Date(), 'dd/MM/yyyy'));
     }
 
     let parentDiv = document.querySelector("#content-body");
@@ -326,6 +326,69 @@ const taskPage = (() => {
         const deleteImg = document.createElement("img");
         deleteImg.src = deleteIcon;
 
+        details.addEventListener("click",(event) => {
+            const detailsId = event.target.parentElement.parentElement.id.split("-")[1];
+            const detailsContainer = document.createElement("div");
+            detailsContainer.id = "view-details";
+            detailsContainer.style.display = "flex";
+
+            const div = document.createElement("div");
+            div.id = "details-content"
+            
+            const div1 = document.createElement("div");
+            const closeDetails = document.createElement("img");
+            closeDetails.src = closeIcon;
+            div1.appendChild(closeDetails);
+            div.appendChild(div1);
+
+            const detailsTitle = document.createElement("h1");
+            detailsTitle.innerText = tasks[detailsId].title;
+            div.appendChild(detailsTitle);
+            
+            const div2 = document.createElement("div");
+
+            const detailsProjectHeading = document.createElement("p");
+            detailsProjectHeading.innerText = "Project:";
+            const detailsProject = document.createElement("p");
+            detailsProject.innerText = tasks[detailsId].project;
+            div2.appendChild(detailsProjectHeading);
+            div2.appendChild(detailsProject);
+
+            const detailsPriorityHeading = document.createElement("p");
+            detailsPriorityHeading.innerText = "Priority:"
+            const detailsPriority = document.createElement("p");
+            detailsPriority.innerText = tasks[detailsId].priority;
+            div2.appendChild(detailsPriorityHeading);
+            div2.appendChild(detailsPriority);
+
+            const detailsDueDateHeading = document.createElement("p");
+            detailsDueDateHeading.innerText = "Due Date:"
+            const detailsDueDate = document.createElement("p");
+            detailsDueDate.innerText = tasks[detailsId].dueDate;
+            div2.appendChild(detailsDueDateHeading);
+            div2.appendChild(detailsDueDate);
+
+            const detailsDescriptionHeading = document.createElement("p");
+            detailsDescriptionHeading.innerText = "Details:"
+            const detailsDescription = document.createElement("p");
+            if(tasks[detailsId].details===""){
+                detailsDescription.innerText = "N/A";
+            }
+            else{
+                detailsDescription.innerText = tasks[detailsId].details;
+            }
+            div2.appendChild(detailsDescriptionHeading);
+            div2.appendChild(detailsDescription);
+
+            div.appendChild(div2);
+            detailsContainer.appendChild(div);
+            parentDiv.appendChild(detailsContainer);
+
+            closeDetails.addEventListener("click", ()=>{
+                detailsContainer.remove();
+            })
+        });
+        
         editImg.addEventListener("click",(event) => {
             const toedit = event.target.parentElement.parentElement.id;
             parentDiv.appendChild(createEditTaskForm(toedit));
