@@ -78,7 +78,6 @@ const display = (() => {
 
     let parentDiv = document.querySelector("#content-body");
     let container;
-    let taskFormContainer;
 
     const projectContainer = document.querySelector("#projects>ul");
 
@@ -87,7 +86,6 @@ const display = (() => {
     const createTaskForm = () => {
         const formContainer = document.createElement("div");
         formContainer.classList.add("taskform");
-        formContainer.style.display = "none";
 
         const newTaskDiv = document.createElement("div");
 
@@ -206,20 +204,15 @@ const display = (() => {
             count++;
             tasks[count] = newTask;
             if(currentPage!==4 || (currentPage===4 && data.get('project')===document.querySelector("#content-body>h2").innerText)) addTask(newTask,count);
-            formContainer.style.display = "none";
-            form.reset();
-            datePicker.valueAsDate = new Date();
+            formContainer.remove();
         });
 
         closeButton.addEventListener("click",() => {
-            formContainer.style.display = "none";
-            datePicker.valueAsDate = new Date();
+            formContainer.remove();
         });
 
         cancelButton.addEventListener("click", () => {
-            form.reset();
-            formContainer.style.display = "none";
-            datePicker.valueAsDate = new Date();
+            formContainer.remove();
         });
 
         return formContainer;
@@ -230,7 +223,6 @@ const display = (() => {
 
         const formContainer = document.createElement("div");
         formContainer.classList.add("taskform");
-        formContainer.style.display = "flex";
 
         const newTaskDiv = document.createElement("div");
 
@@ -551,11 +543,8 @@ const display = (() => {
         parentDiv.appendChild(heading);
         parentDiv.appendChild(container);
 
-        taskFormContainer = createTaskForm();
-        parentDiv.appendChild(taskFormContainer);
-
         button.addEventListener("click", () => {
-            taskFormContainer.style.display = "flex";
+            parentDiv.appendChild(createTaskForm());
         });
 
         for(let taskId of Object.keys(tasks)){
@@ -646,11 +635,8 @@ const display = (() => {
         parentDiv.appendChild(heading);
         parentDiv.appendChild(container);
 
-        taskFormContainer = createTaskForm();
-        parentDiv.appendChild(taskFormContainer);
-
         button.addEventListener("click", () => {
-            taskFormContainer.style.display = "flex";
+            parentDiv.appendChild(createTaskForm());
         });
 
         for(let taskId of Object.keys(tasks)){
@@ -681,7 +667,72 @@ const display = (() => {
         return project;
     };
 
+    const addProjectForm = () => {
+        const addProjectContainer = document.createElement("div");
+        addProjectContainer.id = "add-project";
+
+        const div = document.createElement("div");
+        div.id = "addProject-content"
+        
+        const div1 = document.createElement("div");
+        const closeProjects = document.createElement("img");
+        closeProjects.src = closeIcon;
+        div1.appendChild(closeProjects);
+        div.appendChild(div1);
+
+        const heading = document.createElement("h1");
+        heading.innerText = "Create Project";
+        div.appendChild(heading);
+
+        const div2 = document.createElement("div");
+
+        const newProjectForm = document.createElement("form");
+        newProjectForm.id = "project-form";
+        const newProjectInput = document.createElement("input");
+        newProjectInput.placeholder = "Gym";
+        newProjectInput.name = "project";
+        newProjectInput.required = true;
+        newProjectInput.maxLength ="10";
+        newProjectForm.appendChild(newProjectInput);
+        div2.appendChild(newProjectForm);
+
+        const div3 = document.createElement("div");
+        const addProjectButton = document.createElement("button");
+        addProjectButton.innerText = "Add";
+        addProjectButton.setAttribute("form","project-form");
+        const cancelProjectButton = document.createElement("button");
+        cancelProjectButton.innerText = "Cancel";
+        div3.appendChild(addProjectButton);
+        div3.appendChild(cancelProjectButton);
+        div2.appendChild(div3);
+        div.appendChild(div2);
+
+        addProjectContainer.appendChild(div);
+        parentDiv.appendChild(addProjectContainer);
+
+        closeProjects.addEventListener("click", () => {
+            addProjectContainer.remove();
+        });
+
+        cancelProjectButton.addEventListener("click", () => {
+            addProjectContainer.remove();
+        });
+
+        newProjectForm.addEventListener("submit",(event) => {
+            event.preventDefault();
+            const data = new FormData(event.target);
+            const newProjectName = data.get("project").slice(0,1).toUpperCase()+data.get('project').slice(1);
+            projects.push(newProjectName);
+            projectContainer.appendChild(createProject(newProjectName));
+            addProjectContainer.remove();
+            parentDiv.innerHTML = "";
+            loadProjectTasks(newProjectName);
+        });
+    };
+
     const loadProjects = () => {
+        const addProjectButton = document.querySelector("#projects>h2>img");
+        addProjectButton.addEventListener("click", addProjectForm);
         for(let projectName of projects){
             const project = createProject(projectName);
             projectContainer.appendChild(project);
