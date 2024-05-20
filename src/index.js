@@ -1,10 +1,8 @@
 import './style.css';
-import taskPage from './render.js';
+import display from './render.js';
 
-taskPage.loadAll();
-
-let currentSection = 0;
-let currentTab = 0;
+display.loadProjects();
+display.loadAll();
 
 const container = document.querySelector("#content-body")
 
@@ -14,38 +12,22 @@ const thisWeek = document.querySelector("#home>ul>li:nth-child(3)");
 const due = document.querySelector("#home>ul>li:last-child");
 
 allTasks.addEventListener("click", () => {
-    if(!(currentSection===0 && currentTab===0)){
-        container.innerHTML = "";
-        taskPage.loadAll();
-        currentSection = 0;
-        currentTab = 0;
-    }
+    container.innerHTML = "";
+    display.loadAll();
 });
 
 today.addEventListener("click", () => {
-    if(!(currentSection===0 && currentTab===1)){
-        container.innerHTML = "";
-        taskPage.loadToday();
-        currentSection = 0;
-        currentTab = 1;
-    }
+    container.innerHTML = "";
+    display.loadToday();
 });
 
 thisWeek.addEventListener("click", () => {
-    if(!(currentSection===0 && currentTab===2)){
-        container.innerHTML = "";
-        taskPage.loadThisWeek();
-        currentSection = 0;
-        currentTab = 2;
-    }
+    container.innerHTML = "";
+    display.loadThisWeek();
 })
 
 due.addEventListener("click", () => {
-    if(!(currentSection===0 && currentTab===3)){
-        container.innerHTML = "";
-        taskPage.loadPastDue();
-        currentSection = 0;
-        currentTab = 3;
-    }
+    container.innerHTML = "";
+    display.loadPastDue();
 });
 

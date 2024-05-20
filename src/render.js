@@ -4,8 +4,12 @@ import addIcon from './icons/addtask.svg';
 import editIcon from './icons/edit.svg';
 import deleteIcon from './icons/delete.svg';
 import closeIcon from './icons/close.svg';
+import projectIcon from './icons/projects.svg';
+import projectMenuIcon from './icons/projectMenu.svg';
 
-const taskPage = (() => {
+const display = (() => {
+
+    const projects = ["General","Work","Study"];
 
     const dummyData = [
         { title: "Buy groceries", priority: "High", category: "General", details: "Milk, Eggs, Bread, and Butter", status: "Not Finished" },
@@ -69,12 +73,14 @@ const taskPage = (() => {
         if(count<=3) offset = -1-Math.floor(Math.random()*7);
         else if(count<=8) offset = 0; 
         else offset = Math.floor(Math.random()*20);
-        tasks[count] = task(data.title,data.priority,format(addDays(new Date(),offset), "dd/MM/yyyy"),"General",data.details,data.status);
+        tasks[count] = task(data.title,data.priority,format(addDays(new Date(),offset), "dd/MM/yyyy"),data.category,data.details,data.status);
     }
 
     let parentDiv = document.querySelector("#content-body");
     let container;
     let taskFormContainer;
+
+    const projectContainer = document.querySelector("#projects>ul");
 
     let currentPage = 0;
 
@@ -131,10 +137,13 @@ const taskPage = (() => {
         const projectList = document.createElement("select");
         projectList.id = "project";
         projectList.name = "project";
-        const projectOption1 = document.createElement("option");
-        projectOption1.innerText = "General";
-        projectOption1.value = "General";
-        projectList.appendChild(projectOption1);
+        for(let project of projects){
+            const projectOption = document.createElement("option");
+            projectOption.innerText = project;
+            projectOption.value = project;
+            if(currentPage===4 && project===document.querySelector("#content-body>h2").innerText) projectOption.selected = true;
+            projectList.appendChild(projectOption);   
+        }
         subdiv1.appendChild(projectLabel);
         subdiv1.appendChild(projectList);
         const subdiv2 = document.createElement("div");
@@ -196,7 +205,7 @@ const taskPage = (() => {
             const newTask = task(data.get('title'),data.get('priority'),format(new Date(data.get("date")), 'dd/MM/yyyy'),data.get('project'),data.get('details'));
             count++;
             tasks[count] = newTask;
-            addTask(newTask,count);
+            if(currentPage!==4 || (currentPage===4 && data.get('project')===document.querySelector("#content-body>h2").innerText)) addTask(newTask,count);
             formContainer.style.display = "none";
             form.reset();
             datePicker.valueAsDate = new Date();
@@ -271,11 +280,13 @@ const taskPage = (() => {
         const projectList = document.createElement("select");
         projectList.id = "edit-project";
         projectList.name = "project";
-        const projectOption1 = document.createElement("option");
-        projectOption1.innerText = "General";
-        projectOption1.value = "General";
-        projectOption1.selected = true;
-        projectList.appendChild(projectOption1);
+        for(let project of projects){
+            const projectOption = document.createElement("option");
+            projectOption.innerText = project;
+            projectOption.value = project;
+            if(project === tasks[taskId].project) projectOption.selected = true;
+            projectList.appendChild(projectOption);
+        }
         subdiv1.appendChild(projectLabel);
         subdiv1.appendChild(projectList);
         const subdiv2 = document.createElement("div");
@@ -369,7 +380,7 @@ const taskPage = (() => {
                     document.querySelector(`#${toEdit}`).remove();
                 }
             }
-            else{
+            else if(currentPage===3){
                 const [d,m,y] = tasks[taskId].dueDate.split("/")
                 const date = new Date(parseInt(y),parseInt(m)-1,parseInt(d));
                 const delta = differenceInDays(date,new Date());
@@ -380,6 +391,14 @@ const taskPage = (() => {
                 else{
                     document.querySelector(`#${toEdit}`).remove();
                 } 
+            }
+            else{
+                const currentProject = document.querySelector("#content-body>h2").innerText;
+                if(tasks[taskId].project===currentProject){
+                    document.querySelector(`#${toEdit}>.span-1>span`).innerText = tasks[taskId].title;
+                    document.querySelector(`#${toEdit}>.span-2>span`).innerText = tasks[taskId].dueDate;
+                }
+                else document.querySelector(`#${toEdit}`).remove();
             }
 
             formContainer.remove();
@@ -597,8 +616,6 @@ const taskPage = (() => {
         parentDiv.appendChild(heading);
         parentDiv.appendChild(container);
 
-        const weekend = nextSunday(new Date());
-
         for(let taskId of Object.keys(tasks)){
             const [d,m,y] = tasks[taskId].dueDate.split("/")
             const date = new Date(parseInt(y),parseInt(m)-1,parseInt(d));
@@ -609,9 +626,69 @@ const taskPage = (() => {
         currentPage = 3;
     };
 
+    const loadProjectTasks = (name) => {
+        currentPage = 4;
 
+        container = document.createElement("div");
+        container.setAttribute("class","tasks");
 
-    return {loadAll,loadToday,loadThisWeek,loadPastDue};
+        const heading = document.createElement("h2");
+        heading.append(name);
+
+        const button = document.createElement("button");
+        button.classList.add("addTask");
+        const addImage = document.createElement("img");
+        addImage.src = addIcon;
+
+        button.appendChild(addImage);
+        heading.appendChild(button);
+
+        parentDiv.appendChild(heading);
+        parentDiv.appendChild(container);
+
+        taskFormContainer = createTaskForm();
+        parentDiv.appendChild(taskFormContainer);
+
+        button.addEventListener("click", () => {
+            taskFormContainer.style.display = "flex";
+        });
+
+        for(let taskId of Object.keys(tasks)){
+            if(tasks[taskId].project === name) addTask(tasks[taskId],taskId);
+        }
+    };
+
+    const createProject = (name) => {
+        const project = document.createElement("li");
+        const span1 = document.createElement("span");
+        const projectImg = document.createElement("img");
+        projectImg.src = projectIcon;
+        span1.appendChild(projectImg);
+        const span2 = document.createElement("span");
+        span2.innerText = name;
+        span1.appendChild(span2);
+        const projectMenuImg = document.createElement("img");
+        projectMenuImg.src = projectMenuIcon;
+
+        project.appendChild(span1);
+        project.appendChild(projectMenuImg);
+
+        span1.addEventListener("click", (event) => {
+            parentDiv.innerHTML = "";
+            loadProjectTasks(event.target.innerText);
+        });
+
+        return project;
+    };
+
+    const loadProjects = () => {
+        for(let projectName of projects){
+            const project = createProject(projectName);
+            projectContainer.appendChild(project);
+        }
+    };
+
+    return {loadAll,loadToday,loadThisWeek,loadPastDue,loadProjects};
 })();
 
-export default taskPage;
+export default display;
