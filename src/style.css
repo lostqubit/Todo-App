@@ -15,7 +15,6 @@ ul{
 }
 
 body{
-    position:absolute;
     height:100%;
     display: grid;
     grid-template-rows: 55px 1fr;
@@ -41,6 +40,7 @@ header img{
     grid-template-columns: minmax(200px,300px) minmax(700px,1fr);
     min-height: 0;
     height: calc(100%-55px);
+    overflow: auto;
 }
 
 #sidebar{
