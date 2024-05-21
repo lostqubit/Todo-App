@@ -359,6 +359,17 @@ const display = (() => {
             tasks[taskId].project = data.get('project');
             tasks[taskId].details = data.get('details');
             
+            const card = document.querySelector(`#${toEdit}`);
+            if(tasks[taskId].priority === "High"){
+                card.style.borderLeft = "5px solid red";
+            }
+            else if(tasks[taskId].priority == "Medium"){
+                card.style.borderLeft = "5px solid orange";
+            }
+            else{
+                card.style.borderLeft = "5px solid green";
+            }
+            
             if(currentPage===0){
                 document.querySelector(`#${toEdit}>.span-1>span`).innerText = tasks[taskId].title;
                 document.querySelector(`#${toEdit}>.span-2>span`).innerText = tasks[taskId].dueDate;
@@ -532,6 +543,15 @@ const display = (() => {
     const addTask = (task,taskId) => {
         const {card,title,dueDate} = createTaskContainer();
         card.id = `task-${taskId}`;
+        if(tasks[taskId].priority === "High"){
+            card.style.borderLeft = "5px solid red";
+        }
+        else if(tasks[taskId].priority == "Medium"){
+            card.style.borderLeft = "5px solid orange";
+        }
+        else{
+            card.style.borderLeft = "5px solid green";
+        }
         title.innerText = task.title;
         dueDate.innerText = task.dueDate;
         container.prepend(card);
@@ -771,7 +791,7 @@ const display = (() => {
 
         const div3 = document.createElement("div");
         const editProjectButton = document.createElement("button");
-        editProjectButton.innerText = "Edit";
+        editProjectButton.innerText = "Save";
         editProjectButton.setAttribute("form","editProject-form");
         const cancelProjectButton = document.createElement("button");
         cancelProjectButton.innerText = "Cancel";
