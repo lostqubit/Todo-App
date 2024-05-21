@@ -9,7 +9,7 @@ import projectMenuIcon from './icons/projectMenu.svg';
 
 const display = (() => {
 
-    const projects = ["General","Work","Study"];
+    const dummyProjects = ["General","Work","Study"];
 
     const dummyData = [
         { title: "Buy groceries", priority: "High", category: "General", details: "Milk, Eggs, Bread, and Butter", status: "Not Finished" },
@@ -64,8 +64,10 @@ const display = (() => {
       ];
       
     const tasks = {};
+    const projects = {};
       
     let count = 0;
+    let projectCount = 0;
     
     for(let data of dummyData){
         count++;
@@ -74,6 +76,11 @@ const display = (() => {
         else if(count<=8) offset = 0; 
         else offset = Math.floor(Math.random()*20);
         tasks[count] = task(data.title,data.priority,format(addDays(new Date(),offset), "dd/MM/yyyy"),data.category,data.details,data.status);
+    }
+
+    for(let project of dummyProjects){
+        projectCount++;
+        projects[projectCount] = project;
     }
 
     let parentDiv = document.querySelector("#content-body");
@@ -109,6 +116,7 @@ const display = (() => {
         titleInput.id = "title";
         titleInput.name = "title";
         titleInput.required = true;
+        titleInput.maxLength ="20";
         div1.appendChild(titleLabel);
         div1.appendChild(titleInput);
         form.appendChild(div1);
@@ -123,6 +131,7 @@ const display = (() => {
         details.name = "details";
         details.rows = "10";
         details.cols = "50";
+        details.maxLength="100";
         div2.appendChild(detailsLabel);
         div2.appendChild(details);
         form.appendChild(div2);
@@ -135,11 +144,11 @@ const display = (() => {
         const projectList = document.createElement("select");
         projectList.id = "project";
         projectList.name = "project";
-        for(let project of projects){
+        for(let projectId of Object.keys(projects)){
             const projectOption = document.createElement("option");
-            projectOption.innerText = project;
-            projectOption.value = project;
-            if(currentPage===4 && project===document.querySelector("#content-body>h2").innerText) projectOption.selected = true;
+            projectOption.innerText = projects[projectId];
+            projectOption.value = projects[projectId];
+            if(currentPage===4 && projects[projectId]===document.querySelector("#content-body>h2").innerText) projectOption.selected = true;
             projectList.appendChild(projectOption);   
         }
         subdiv1.appendChild(projectLabel);
@@ -246,6 +255,7 @@ const display = (() => {
         titleInput.name = "title";
         titleInput.required = true;
         titleInput.value = tasks[taskId].title;
+        titleInput.maxLength ="20"
         div1.appendChild(titleLabel);
         div1.appendChild(titleInput);
         form.appendChild(div1);
@@ -259,6 +269,7 @@ const display = (() => {
         details.name = "details";
         details.rows = "10";
         details.cols = "50";
+        details.maxLength = "100";
         details.value = tasks[taskId].details;
         div2.appendChild(detailsLabel);
         div2.appendChild(details);
@@ -272,11 +283,12 @@ const display = (() => {
         const projectList = document.createElement("select");
         projectList.id = "edit-project";
         projectList.name = "project";
-        for(let project of projects){
+        for(let projectId of Object.keys(projects)){
             const projectOption = document.createElement("option");
-            projectOption.innerText = project;
-            projectOption.value = project;
-            if(project === tasks[taskId].project) projectOption.selected = true;
+            projectOption.innerText = projects[projectId];
+            projectOption.value = projects[projectId];
+            console.log(projects[projectId],tasks[taskId].project);
+            if(projects[projectId] === tasks[taskId].project) projectOption.selected = true;
             projectList.appendChild(projectOption);
         }
         subdiv1.appendChild(projectLabel);
@@ -644,7 +656,12 @@ const display = (() => {
         }
     };
 
-    const createProject = (name) => {
+    const createProject = (name,newProjectId=-1) => {
+        if(newProjectId===-1){
+            projectCount++;
+            projects[projectCount] = name;
+        }
+
         const project = document.createElement("li");
         const span1 = document.createElement("span");
         const projectImg = document.createElement("img");
@@ -653,18 +670,140 @@ const display = (() => {
         const span2 = document.createElement("span");
         span2.innerText = name;
         span1.appendChild(span2);
+
+        const dropdown = document.createElement("div");
+        dropdown.classList.add("dropdown");
+        if(newProjectId===-1) dropdown.id = `dropdown-${projectCount}`;
+        else dropdown.id = `dropdown-${newProjectId}`
         const projectMenuImg = document.createElement("img");
         projectMenuImg.src = projectMenuIcon;
+        if(newProjectId===-1) projectMenuImg.id = `project-${projectCount}`;
+        else projectMenuImg.id = `project-${newProjectId}`;
+        projectMenuImg.classList.add("dropdown-icon");
+        dropdown.appendChild(projectMenuImg);
 
         project.appendChild(span1);
-        project.appendChild(projectMenuImg);
+        project.appendChild(dropdown);
 
         span1.addEventListener("click", (event) => {
             parentDiv.innerHTML = "";
             loadProjectTasks(event.target.innerText);
         });
 
+        projectMenuImg.addEventListener("click", (event) => {
+            if(document.querySelector(".dropdown-content")) {
+                if(event.target.id.split("-")[1] === document.querySelector(".dropdown-content").id.split("-")[2]){
+                    document.querySelector(".dropdown-content").remove();
+                    return;
+                }
+                else{
+                    document.querySelector(".dropdown-content").remove();
+                }
+            }
+            const projectId = event.target.id.split("-")[1];
+            const dropdownDiv = document.createElement("div");
+            dropdownDiv.classList.add("dropdown-content");
+            dropdownDiv.id = `dropdown-content-${projectId}`;
+            const ul = document.createElement("ul");
+            const editOption = document.createElement("li");
+            editOption.innerText = "Edit";
+            const deleteOption = document.createElement("li");
+            deleteOption.innerText = "Delete";
+            ul.appendChild(editOption);
+            ul.appendChild(deleteOption);
+            dropdownDiv.appendChild(ul);
+            dropdown.appendChild(dropdownDiv);
+
+            editOption.addEventListener("click", () => {
+                editProjectForm(projectId,span2);
+            });
+
+            deleteOption.addEventListener("click", () => {
+                delete projects[projectId];
+                for(let taskId of Object.keys(tasks)){
+                    if(tasks[taskId].project===span2.innerText) delete tasks[taskId];
+                }
+                parentDiv.innerHTML = "";
+                loadAll();
+                project.remove();
+            });
+
+            window.addEventListener('click', (event) => {
+                if (!event.target.matches('.dropdown-icon')) {
+                    if(document.querySelector(".dropdown-content")){
+                        dropdownDiv.remove();
+                    }
+                }
+            });
+        });
+
         return project;
+    };
+
+    const editProjectForm = (toEditId,toEditHeading) => {
+        const editProjectContainer = document.createElement("div");
+        editProjectContainer.id = "editProject";
+
+        const div = document.createElement("div");
+        div.id = "editProject-content"
+        
+        const div1 = document.createElement("div");
+        const closeProjects = document.createElement("img");
+        closeProjects.src = closeIcon;
+        div1.appendChild(closeProjects);
+        div.appendChild(div1);
+
+        const heading = document.createElement("h1");
+        heading.innerText = "Edit Project";
+        div.appendChild(heading);
+
+        const div2 = document.createElement("div");
+
+        const newProjectForm = document.createElement("form");
+        newProjectForm.id = "editProject-form";
+        const newProjectInput = document.createElement("input");
+        newProjectInput.name = "project";
+        newProjectInput.required = true;
+        newProjectInput.maxLength ="10";
+        newProjectInput.value = projects[toEditId];
+        newProjectForm.appendChild(newProjectInput);
+        div2.appendChild(newProjectForm);
+
+        const div3 = document.createElement("div");
+        const editProjectButton = document.createElement("button");
+        editProjectButton.innerText = "Edit";
+        editProjectButton.setAttribute("form","editProject-form");
+        const cancelProjectButton = document.createElement("button");
+        cancelProjectButton.innerText = "Cancel";
+        div3.appendChild(editProjectButton);
+        div3.appendChild(cancelProjectButton);
+        div2.appendChild(div3);
+        div.appendChild(div2);
+
+        editProjectContainer.appendChild(div);
+        parentDiv.appendChild(editProjectContainer);
+
+        closeProjects.addEventListener("click", () => {
+            editProjectContainer.remove();
+        });
+
+        cancelProjectButton.addEventListener("click", () => {
+            editProjectContainer.remove();
+        });
+
+        newProjectForm.addEventListener("submit",(event) => {
+            event.preventDefault();
+            const data = new FormData(event.target);
+            const newProjectName = data.get("project").slice(0,1).toUpperCase()+data.get('project').slice(1);
+            for(let taskId of Object.keys(tasks)){
+                if(tasks[taskId].project===projects[toEditId]) tasks[taskId].project = newProjectName;
+            }
+            projects[toEditId] = newProjectName;
+            toEditHeading.innerText = newProjectName;
+            editProjectContainer.remove();
+            parentDiv.innerHTML = "";
+            loadProjectTasks(newProjectName);
+        });
     };
 
     const addProjectForm = () => {
@@ -687,7 +826,7 @@ const display = (() => {
         const div2 = document.createElement("div");
 
         const newProjectForm = document.createElement("form");
-        newProjectForm.id = "project-form";
+        newProjectForm.id = "addProject-form";
         const newProjectInput = document.createElement("input");
         newProjectInput.placeholder = "Gym";
         newProjectInput.name = "project";
@@ -699,7 +838,7 @@ const display = (() => {
         const div3 = document.createElement("div");
         const addProjectButton = document.createElement("button");
         addProjectButton.innerText = "Add";
-        addProjectButton.setAttribute("form","project-form");
+        addProjectButton.setAttribute("form","addProject-form");
         const cancelProjectButton = document.createElement("button");
         cancelProjectButton.innerText = "Cancel";
         div3.appendChild(addProjectButton);
@@ -722,7 +861,6 @@ const display = (() => {
             event.preventDefault();
             const data = new FormData(event.target);
             const newProjectName = data.get("project").slice(0,1).toUpperCase()+data.get('project').slice(1);
-            projects.push(newProjectName);
             projectContainer.appendChild(createProject(newProjectName));
             addProjectContainer.remove();
             parentDiv.innerHTML = "";
@@ -733,8 +871,8 @@ const display = (() => {
     const loadProjects = () => {
         const addProjectButton = document.querySelector("#projects>h2>img");
         addProjectButton.addEventListener("click", addProjectForm);
-        for(let projectName of projects){
-            const project = createProject(projectName);
+        for(let projectId of Object.keys(projects)){
+            const project = createProject(projects[projectId],projectId);
             projectContainer.appendChild(project);
         }
     };
