@@ -21,7 +21,7 @@ const display = (() => {
         { title: "Read a book", priority: "Low", category: "General", details: "Finish reading 'The Alchemist'", status: "Finished" },
         { title: "Plan weekend trip", priority: "Medium", category: "General", details: "Choose a destination and book accommodation", status: "Not Finished" },
         { title: "Clean the house", priority: "Low", category: "General", details: "Vacuum, dust, and mop all rooms", status: "Not Finished" },
-        { title: "Schedule team meeting", priority: "High", category: "Work", details: "Set up a meeting with the project team to discuss progress", status: "Not Finished" },
+        { title: "Schedule team meeting", priority: "High", category: "Work", details: "Set up a meeting with the project team to discuss progress", status: "Finished" },
         { title: "Grocery shopping", priority: "High", category: "General", details: "Buy vegetables and fruits", status: "Finished" },
         { title: "Submit tax documents", priority: "Medium", category: "Work", details: "Prepare and submit tax returns", status: "Not Finished" },
         { title: "Renew car insurance", priority: "High", category: "General", details: "Renew policy before expiry", status: "Not Finished" },
@@ -45,21 +45,21 @@ const display = (() => {
         { title: "Fix the car", priority: "Low", category: "General", details: "Change oil and check tire pressure", status: "Not Finished" },
         { title: "Write thank you notes", priority: "Medium", category: "General", details: "Send thank you notes to friends", status: "Finished" },
         { title: "Attend doctor's appointment", priority: "High", category: "General", details: "Annual physical check-up", status: "Not Finished" },
-        { title: "Organize files", priority: "Low", category: "Work", details: "Sort and file important documents", status: "Not Finished" },
+        { title: "Organize files", priority: "Low", category: "Work", details: "Sort and file important documents", status: "Finished" },
         { title: "Cook a new recipe", priority: "Medium", category: "General", details: "Try making a new dish", status: "Not Finished" },
         { title: "Plan project timeline", priority: "High", category: "Work", details: "Create a timeline for the new project", status: "Not Finished" },
         { title: "Watch a movie", priority: "Low", category: "General", details: "Watch a new release movie", status: "Finished" },
         { title: "Volunteer at shelter", priority: "High", category: "General", details: "Help out at the local animal shelter", status: "Not Finished" },
         { title: "Plan vacation", priority: "Medium", category: "General", details: "Plan the details of the summer vacation", status: "Not Finished" },
         { title: "Renew gym membership", priority: "High", category: "General", details: "Renew membership for the next month", status: "Not Finished" },
-        { title: "Write progress report", priority: "Medium", category: "Work", details: "Prepare the monthly progress report", status: "Not Finished" },
+        { title: "Write progress report", priority: "Medium", category: "Work", details: "Prepare the monthly progress report", status: "Finished" },
         { title: "Clean the fridge", priority: "Low", category: "General", details: "Clean and organize the refrigerator", status: "Not Finished" },
-        { title: "Study for exams", priority: "High", category: "Study", details: "Review notes and practice problems", status: "Not Finished" },
+        { title: "Study for exams", priority: "High", category: "Study", details: "Review notes and practice problems", status: "Finished" },
         { title: "Complete assignment", priority: "Medium", category: "Study", details: "Finish and submit the assignment before the deadline", status: "Not Finished" },
-        { title: "Attend study group", priority: "Low", category: "Study", details: "Participate in the study group meeting", status: "Not Finished" },
+        { title: "Attend study group", priority: "Low", category: "Study", details: "Participate in the study group meeting", status: "Finished" },
         { title: "Organize study materials", priority: "Medium", category: "Study", details: "Sort and file study notes and materials", status: "Not Finished" },
         { title: "Read research papers", priority: "High", category: "Study", details: "Read and summarize recent research papers", status: "Not Finished" },
-        { title: "Prepare for quiz", priority: "Medium", category: "Study", details: "Study for the upcoming quiz", status: "Not Finished" },
+        { title: "Prepare for quiz", priority: "Medium", category: "Study", details: "Study for the upcoming quiz", status: "Finished" },
         { title: "Watch online lecture", priority: "Low", category: "Study", details: "Watch and take notes from the online lecture", status: "Not Finished" }
       ];
       
@@ -537,11 +537,11 @@ const display = (() => {
         card.appendChild(span1);
         card.appendChild(span2);
 
-        return{card,title,dueDate};
+        return{checkBox,card,title,dueDate};
     }
 
     const addTask = (task,taskId) => {
-        const {card,title,dueDate} = createTaskContainer();
+        const {checkBox,card,title,dueDate} = createTaskContainer();
         card.id = `task-${taskId}`;
         if(tasks[taskId].priority === "High"){
             card.style.borderLeft = "5px solid red";
@@ -554,6 +554,23 @@ const display = (() => {
         }
         title.innerText = task.title;
         dueDate.innerText = task.dueDate;
+        if(task.status === "Finished"){
+            checkBox.checked = true;
+            card.style.opacity = "0.5";
+            title.style.textDecoration = "line-through";
+        }
+        checkBox.addEventListener("change", () => {
+            if(checkBox.checked){
+                tasks[taskId].status = "Finished";
+                card.style.opacity = "0.5";
+                title.style.textDecoration = "line-through";
+            }
+            else{
+                tasks[taskId].status = "Not Finished";
+                card.style.opacity = "1";
+                title.style.textDecoration = "none";
+            }
+        });
         container.prepend(card);
     };
 
